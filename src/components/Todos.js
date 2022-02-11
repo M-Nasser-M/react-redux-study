@@ -1,22 +1,20 @@
 import React, { useEffect, useRef } from "react";
 import { Button, FormControl, Row } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
+import { connect } from "react-redux";
 import { addTodo, initializeTodos } from "../actions/todosAction";
 
-let id = 0;
-function Todos() {
-  const dispatch = useDispatch();
-  const todos = useSelector((state) => state.todos);
+function Todos(props) {
+  console.log(props);
   const input = useRef(null);
 
   useEffect(() => {
-    dispatch(initializeTodos());
-  }, [dispatch]);
+    props.dispatch(initializeTodos());
+  }, []);
 
   const handleAdd = () => {
     const todoText = input.current.value;
-    const todo = { todoText: todoText, id: id++ };
-    dispatch(addTodo(todo));
+    const todo = { todoText: todoText, id: props.todos.length + 1 };
+    props.dispatch(addTodo(todo));
     input.current.value = "";
   };
 
@@ -30,7 +28,7 @@ function Todos() {
       </Row>
       <Row>
         <ul>
-          {todos?.map((todo) => (
+          {props.todos?.map((todo) => (
             <li key={todo.id}>{todo.todoText}</li>
           ))}
         </ul>
@@ -39,4 +37,11 @@ function Todos() {
   );
 }
 
-export default Todos;
+const mapStateToProps = (state) => {
+  return { todos: state.todos };
+};
+const mapDispatchToProps = (dispatch) => {
+  return { dispatch };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Todos);
